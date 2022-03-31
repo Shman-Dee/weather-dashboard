@@ -1,18 +1,3 @@
-// GIVEN a weather dashboard with form inputs
-// WHEN I search for a city
-// THEN I am presented with current and future conditions for that city and that city is added to the search history
-// WHEN I view current weather conditions for that city
-// THEN I am presented with the city name, the date, an icon representation of weather conditions, the temperature, the humidity, the wind speed, and the UV index
-// WHEN I view the UV index
-// THEN I am presented with a color that indicates whether the conditions are favorable, moderate, or severe
-// WHEN I view future weather conditions for that city
-// THEN I am presented with a 5-day forecast that displays the date, an icon representation of weather conditions, the temperature, the wind speed, and the humidity
-// WHEN I click on a city in the search history
-// THEN I am again presented with current and future conditions for that city
-
-//insert code
-
-
 function initPage() {
   const inputEl = document.getElementById("city-input");
   const searchEl = document.getElementById("search-button");
@@ -26,24 +11,18 @@ function initPage() {
   const currentUVEl = document.getElementById("UV-index");
   const historyEl = document.getElementById("history");
   let searchHistory = JSON.parse(localStorage.getItem("search")) || [];
-  console.log(searchHistory);
+  
 
   const APIKey = "6448d495612ed8aa879917708af54be4";
-  //  When search button is clicked, read the city name typed by the user
 
   function getWeather(cityName) {
-    //  Using saved city name, execute a current condition get request from open weather map api
     let queryURL =
       "https://api.openweathermap.org/data/2.5/weather?q=" +
       cityName +
       "&appid=" +
       APIKey;
     axios.get(queryURL).then(function (response) {
-      console.log(response);
-      //  Parse response to display current conditions
-      //  Method for using "date" objects obtained from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
       const currentDate = new Date(response.data.dt * 1000);
-      console.log(currentDate);
       const day = currentDate.getDate();
       const month = currentDate.getMonth() + 1;
       const year = currentDate.getFullYear();
@@ -78,7 +57,7 @@ function initPage() {
         currentUVEl.innerHTML = "UV Index: ";
         currentUVEl.append(UVIndex);
       });
-      //  Using saved city name, execute a 5-day forecast get request from open weather map api
+
       let cityID = response.data.id;
       let forecastQueryURL =
         "https://api.openweathermap.org/data/2.5/forecast?id=" +
@@ -86,8 +65,6 @@ function initPage() {
         "&appid=" +
         APIKey;
       axios.get(forecastQueryURL).then(function (response) {
-        //  Parse response to display forecast for next 5 days underneath current conditions
-        console.log(response);
         const forecastEls = document.querySelectorAll(".forecast");
         for (i = 0; i < forecastEls.length; i++) {
           forecastEls[i].innerHTML = "";
@@ -153,7 +130,6 @@ function initPage() {
     historyEl.innerHTML = "";
     for (let i = 0; i < searchHistory.length; i++) {
       const historyItem = document.createElement("input");
-      // <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="email@example.com"></input>
       historyItem.setAttribute("type", "text");
       historyItem.setAttribute("readonly", true);
       historyItem.setAttribute("class", "form-control d-block bg-white");
@@ -169,8 +145,5 @@ function initPage() {
   if (searchHistory.length > 0) {
     getWeather(searchHistory[searchHistory.length - 1]);
   }
-
-  //  Save user's search requests and display them underneath search form
-  //  When page loads, automatically generate current conditions and 5-day forecast for the last city the user searched for
 }
 initPage();
