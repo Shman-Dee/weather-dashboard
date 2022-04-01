@@ -147,7 +147,7 @@ function startPage() {
     }
   }
 
-  useSearchHistory();
+  SearchHistory();
   if (searchHistory.length > 0) {
     fetchWeather(searchHistory[searchHistory.length - 1]);
   }
