@@ -1,27 +1,29 @@
-function initPage() {
+function startPage() {
+  //grab all elements
   const inputEl = document.getElementById("city-input");
   const searchEl = document.getElementById("search-button");
   const clearEl = document.getElementById("clear-history");
   const nameEl = document.getElementById("city-name");
-  const currentPicEl = document.getElementById("current-pic");
-  const currentTempEl = document.getElementById("temperature");
+  const currentPictureElement = document.getElementById("current-picture");
+  const currentTemperatureEl = document.getElementById("temperature");
   const currentHumidityEl = document.getElementById("humidity");
   4;
   const currentWindEl = document.getElementById("wind-speed");
   const currentUVEl = document.getElementById("UV-index");
   const historyEl = document.getElementById("history");
   let searchHistory = JSON.parse(localStorage.getItem("search")) || [];
-  
 
   const APIKey = "6448d495612ed8aa879917708af54be4";
-
-  function getWeather(cityName) {
+  // function to fetch data from the api
+  function fetchWeather(cityName) {
     let queryURL =
       "https://api.openweathermap.org/data/2.5/weather?q=" +
       cityName +
       "&appid=" +
       APIKey;
+    //data call
     axios.get(queryURL).then(function (response) {
+      //date method on javascript
       const currentDate = new Date(response.data.dt * 1000);
       const day = currentDate.getDate();
       const month = currentDate.getMonth() + 1;
@@ -29,12 +31,15 @@ function initPage() {
       nameEl.innerHTML =
         response.data.name + " (" + month + "/" + day + "/" + year + ") ";
       let weatherPic = response.data.weather[0].icon;
-      currentPicEl.setAttribute(
+      currentPictureElement.setAttribute(
         "src",
-        "https://openweathermap.org/img/wn/" + weatherPic + "@2x.png"
+        "https://openweathermap.org/img/wn/" + weatherPic + "@4x.png"
       );
-      currentPicEl.setAttribute("alt", response.data.weather[0].description);
-      currentTempEl.innerHTML =
+      currentPictureElement.setAttribute(
+        "alt",
+        response.data.weather[0].description
+      );
+      currentTemperatureEl.innerHTML =
         "Temperature: " + k2f(response.data.main.temp) + " &#176F";
       currentHumidityEl.innerHTML =
         "Humidity: " + response.data.main.humidity + "%";
@@ -64,6 +69,7 @@ function initPage() {
         cityID +
         "&appid=" +
         APIKey;
+      // five day forecast
       axios.get(forecastQueryURL).then(function (response) {
         const forecastEls = document.querySelectorAll(".forecast");
         for (i = 0; i < forecastEls.length; i++) {
@@ -108,42 +114,42 @@ function initPage() {
       });
     });
   }
-
+  //local storage
   searchEl.addEventListener("click", function () {
     const searchTerm = inputEl.value;
-    getWeather(searchTerm);
+    fetchWeather(searchTerm);
     searchHistory.push(searchTerm);
     localStorage.setItem("search", JSON.stringify(searchHistory));
-    renderSearchHistory();
+    useSearchHistory();
   });
 
   clearEl.addEventListener("click", function () {
     searchHistory = [];
-    renderSearchHistory();
+    useSearchHistory();
   });
-
+  //temperature helper function
   function k2f(K) {
     return Math.floor((K - 273.15) * 1.8 + 32);
   }
 
-  function renderSearchHistory() {
+  function useSearchHistory() {
     historyEl.innerHTML = "";
     for (let i = 0; i < searchHistory.length; i++) {
-      const historyItem = document.createElement("input");
-      historyItem.setAttribute("type", "text");
-      historyItem.setAttribute("readonly", true);
-      historyItem.setAttribute("class", "form-control d-block bg-white");
-      historyItem.setAttribute("value", searchHistory[i]);
-      historyItem.addEventListener("click", function () {
-        getWeather(historyItem.value);
+      const historySearch = document.createElement("input");
+      historySearch.setAttribute("type", "text");
+      historySearch.setAttribute("readonly", true);
+      historySearch.setAttribute("class", "form-control d-block bg-white");
+      historySearch.setAttribute("value", searchHistory[i]);
+      historySearch.addEventListener("click", function () {
+        fetchWeather(historySearch.value);
       });
-      historyEl.append(historyItem);
+      historyEl.append(historySearch);
     }
   }
 
-  renderSearchHistory();
+  useSearchHistory();
   if (searchHistory.length > 0) {
-    getWeather(searchHistory[searchHistory.length - 1]);
+    fetchWeather(searchHistory[searchHistory.length - 1]);
   }
 }
-initPage();
+startPage();
